@@ -1,4 +1,4 @@
-# Movement Specification (v0.1)
+# Movement Specification (v0.2)
 
 ---
 
@@ -6,230 +6,304 @@
 
 Movement is controlled stepping, not free running.
 
-Position control should feel deliberate and readable.
-Distance is the primary spatial variable.
+Distance is the primary gameplay variable.
+
+Precision stopping is more important than peak movement speed.
 
 ---
 
 ## Facing & Axis
 
-- Characters always face each other.
-- No cross-over. No side switching.
-- 1D axis only (left / right).
+- Characters always face each other
+- No cross-over
+- No side switching
+- 1D movement only
 
 Forward = toward opponent  
 Backward = away from opponent
 
 ---
 
-## Distance Units
+## Distance Layers
 
-All distances use a unified unit (px).
+### Point Blank
+0 ~ 55px  
+- immediate threat zone  
+- high lethality  
+- fast resolution
 
-Suggested initial anchors:
-- Light Range: ~80px
-- Edge Range: 70px ~ 90px band
-- Medium Pressure Range: ~140px
-- Far Range: ~220px+
+---
 
-(All values are provisional and must be tuned together.)
+### Edge Range
+56 ~ 90px  
+- Light may hit or whiff  
+- main close-range interaction layer  
+- shimmy / delay / parry bait happen here
+
+---
+
+### Neutral Pressure Range
+91 ~ 150px  
+- Medium charge pressure zone
+
+---
+
+### Far
+151px+  
+- low immediate threat
 
 ---
 
 ## Base Movement
 
-### Walk Speed
+Forward speed:
+120 px/s
 
-- Forward speed: 120 px/s
-- Backward speed: 100 px/s
-
-Design intent:
-- Slight forward bias encourages engagement
-- Backward is viable but not dominant
+Backward speed:
+95 px/s
 
 ---
 
 ## Acceleration Model
 
-Movement should not be instant.
+Acceleration:
+850 px/s²
 
-### Acceleration
-- accel: 900 px/s²
+Deceleration:
+1300 px/s²
 
-### Deceleration
-- decel: 1100 px/s²
-
-### Stop Threshold
-- if |velocity| < 10 px/s → snap to 0
+Stop Threshold:
+|velocity| < 12 px/s → snap to 0
 
 Design intent:
-- Quick to start, slightly quicker to stop
-- Enables precise micro-spacing (edge range play)
-
----
-
-## Input Model
-
-- Left / Right held → continuous movement
-- No inertia carry after input release (fast decel)
-- No diagonal / vertical movement
-
----
-
-## Charge Movement Modifiers
-
-### Medium Charge
-- move speed multiplier: 0.55
-
-### Heavy Charge
-- move speed multiplier: 0.35
-
-Design intent:
-- Charge expresses commitment through reduced mobility
-- Still allows repositioning (not a root)
-
----
-
-## Feint Movement
-
-During Feint Lockout:
-
-### Medium Feint
-- move speed: 0.85 × base
-
-### Heavy Feint
-- move speed: 0.75 × base
-
-- movement allowed
-- no attack / parry / dash
-
-Design intent:
-- reposition without offense
-- maintain flow, avoid “freeze”
-
----
-
-## Dash System (Re-engage Only)
-
-Dash is only available after:
-- successful parry vs Heavy
-- pushback occurs
-
-### Dash Input
-- press forward again
-
----
-
-### Dash Kinematics
-
-- startup: 40ms (no movement)
-- travel duration: 100ms
-- total duration: ~140ms
-
-### Dash Distance (base)
-- 90px (provisional)
-
----
-
-## Distance-Dependent Dash Outcome
-
-Dash result depends on spacing at Heavy-parry moment.
-
-### If parry at Close
-- pushback: small
-- dash → likely Point Blank
-
-### If parry at Mid
-- pushback: medium
-- dash → Edge Range
-
-### If parry at Far
-- pushback: large
-- dash → Neutral-edge (not guaranteed close)
-
-Design rule:
-Dash re-engages; it does not guarantee contact.
-
----
-
-## Pushback System
-
-Triggered on Heavy parry.
-
-### Pushback Distance (tiered)
-
-- Close: 60px
-- Mid: 100px
-- Far: 140px
-
-(Values must be tuned against dash distance.)
-
-### Pushback Feel
-
-- short hit-stop (~40ms)
-- smooth backward slide (80~120ms)
-- no control during slide
-
----
-
-## Micro-Spacing Window
-
-Critical gameplay zone: Edge Range (~±10px around Light range)
-
-Movement system must allow:
-- small forward tap
-- small backward tap
-- quick stop
-
-Design requirement:
-- player must be able to “hover” at light boundary
+- responsive start
+- very controllable stop
+- supports edge-range precision
 
 ---
 
 ## Collision Rule
 
 - Characters cannot overlap
-- Minimum separation maintained (e.g., 20px)
-- Movement clamps at collision boundary
+- Minimum separation: 20px
+- Movement clamps at boundary
 
-No pass-through allowed.
-
----
-
-## Timing Alignment (Important)
-
-Movement must align with combat timings:
-
-- Light startup (~90ms) must be readable relative to walk speed
-- Deceleration must allow stop → light without overshoot
-- Dash arrival should place player near intended range tier
+No pushing, no sliding through opponent
 
 ---
 
-## Balance Rules
+## Charge Movement Modifiers
 
-- Movement must not be faster than reaction readability
-- Acceleration must not cause overshoot at Edge Range
-- Backward movement must not invalidate pressure
-- Charge slowdown must be meaningful but not crippling
-- Dash must not collapse spacing layers
+Medium Hold:
+- speed multiplier: 0.55
+
+Heavy Hold:
+- speed multiplier: 0.35
+
+---
+
+## Feint Movement
+
+Medium Feint:
+- speed: 0.85 × base
+- lockout: 120ms
+
+Heavy Feint:
+- speed: 0.75 × base
+- lockout: 150ms
+
+During Feint Lockout:
+- movement allowed
+- attack disabled
+- parry disabled
+- dash disabled
+
+---
+
+# Dash System
+
+## Purpose
+
+Dash is a re-engage tool.
+
+Dash does not guarantee contact.  
+Dash does not guarantee damage.
+
+---
+
+## Activation
+
+Dash is only available after:
+- successful parry vs Heavy
+- pushback state occurs
+- player presses forward
+
+---
+
+## Dash Kinematics
+
+Startup:
+40ms
+
+Travel:
+90ms
+
+Max Distance:
+88px
+
+---
+
+## Dash Termination Conditions
+
+Dash ends when any of the following occurs:
+
+1. Player presses attack confirm (Brake)
+2. Dash reaches max distance
+3. Distance reaches minimum separation boundary
+
+---
+
+## Dash Brake (Critical Rule)
+
+During Dash:
+
+Attack confirm input acts as a Brake.
+
+Brake behavior:
+- immediately stops or sharply reduces movement
+- does NOT create an attack hitbox
+
+This is NOT a Light Attack.
+
+---
+
+## Post-Brake Behavior
+
+After braking:
+
+- player enters a short action lockout (~80–110ms)
+- movement allowed (reduced)
+- attack disabled during lockout
+- parry disabled during lockout
+- dash disabled
+
+To perform a real Light Attack:
+- player must press attack confirm again AFTER lockout
+
+---
+
+## Design Intent (Brake)
+
+- allow mid-dash spacing correction
+- allow stopping at Edge Range
+- prevent dash from becoming a guaranteed attack tool
+
+---
+
+## Contact Handling During Dash
+
+If during Dash:
+
+distance ≤ minimum separation
+
+Then:
+- dash immediately terminates
+- no further forward movement is applied
+
+Player enters close-range interaction state.
+
+---
+
+## Important Rule
+
+Dash does NOT push inside the opponent.
+
+Dash delivers the player to the fight,
+not into overlap.
+
+---
+
+## Dash Outcome by Distance
+
+Dash result depends on spacing at Heavy parry moment.
+
+### Close Parry
+- pushback small
+- dash may enter Point Blank
+
+---
+
+### Mid Parry
+- pushback medium
+- dash lands in Edge Range
+
+---
+
+### Far Parry
+- pushback large
+- dash ends near Neutral-edge
+
+---
+
+## Pushback System
+
+Triggered on Heavy parry
+
+Distances:
+
+Close:
+58px
+
+Mid:
+96px
+
+Far:
+138px
+
+---
+
+## Movement Precision
+
+Players must be able to:
+
+- stop exactly at Edge Range
+- adjust distance with small taps
+- avoid overshooting into Point Blank
+
+---
+
+## Micro Movement
+
+Short tap (80–100ms input):
+~8–14px displacement
+
+Supports:
+- shimmy
+- spacing adjustment
+- baiting
+
+---
+
+## Combat Alignment
+
+Movement must align with combat timing:
+
+- Light startup (~90ms) must be readable vs movement
+- stopping must allow immediate attack
+- dash landing must match distance layer expectations
 
 ---
 
 ## Design Philosophy
 
-Distance creates decisions.
+Movement creates decisions.
 
-Movement should enable:
-- approach
-- hesitation
-- bait
-- correction
+Dash starts the next interaction.  
+Brake decides where the interaction begins.
 
-Not:
-- evasion spam
-- constant drift
-- unreadable jitter
+Distance → Decision → Resolution
 
-The player should feel:
-“I moved there on purpose.”
+The system must feel:
+- deliberate
+- readable
+- controllable
