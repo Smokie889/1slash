@@ -5,45 +5,74 @@ One hit. One decision. One slash.  A real-time multiplayer duel game focused on 
 
 One hit. One decision. One slash.
 
-A fast-paced one-hit kill multiplayer duel game built with WebSocket.
-Focused on reaction speed, mind games, and precision execution.
-Terminal-style UI with a server-authoritative architecture.
+1SLASH is a fast-paced 1v1 duel game inspired by fighting games like Street Fighter 6, reimagined into a minimal, one-hit kill system.
+
+The game features a side-view combat perspective with a terminal-style visual aesthetic, focusing on timing, mind games, and precise decision-making.
 
 ---
 
 ## 🎯 Core Concept
 
-1SLASH is a real-time PvP duel game where a single mistake means defeat.
+A strict two-player duel.
 
-Players face off in a minimalistic arena:
-- Attack
-- Defend
-- Feint
-- React
+No crowds. No chaos. Just you and your opponent.
 
-Every action matters. There is no HP system.
-Only timing, prediction, and decision-making.
+There are:
+- No combos
+- No health bars
+- No complex move lists
 
----
+Only positioning, timing, and psychological pressure.
 
-## ⚔️ Gameplay Features (Planned)
-
-- One-hit kill combat system
-- Real-time multiplayer (WebSocket)
-- Server-authoritative hit validation
-- Client-side prediction & reconciliation
-- Input buffering and anti-spam logic
-- Reaction-based combat mechanics
-- Mind game / feint system
+One clean hit decides everything.
 
 ---
 
-## 🧠 Design Philosophy
+## ⚔️ Gameplay Design
 
-- Easy to learn, hard to master
-- No RNG, skill-based outcome
-- Minimal UI, maximum tension
-- Every frame matters
+### 🎮 Controls
+
+- Move Left / Right
+- Charge (hold)
+- Confirm Attack
+- Parry
+
+---
+
+### 🧠 Combat Mechanics
+
+#### Charge
+- Holding charge creates pressure
+- Limits defensive options
+- Forces opponent reaction
+
+#### Confirm Attack
+- Attack only executes when confirmed
+- Mistimed attacks are punishable
+
+#### Feint
+- Releasing charge without attack triggers a fake
+- Feints create mind games but leave vulnerability
+
+#### Parry
+- Tight timing window defensive action
+- Successful parry counters attack
+- Failed parry results in heavy punishment
+
+---
+
+## 🔁 Core Gameplay Loop
+
+Charge → Pressure → Reaction →  
+Attack or Feint → Parry / Punish → Reset
+
+---
+
+## 🖥️ Visual Style
+
+- Side-view (fighting game perspective)
+- Terminal-style UI
+- Minimalist stickman characters
 
 ---
 
@@ -51,15 +80,14 @@ Only timing, prediction, and decision-making.
 
 Frontend:
 - HTML / Canvas
-- Terminal-style UI rendering
 
 Backend:
 - Node.js
-- WebSocket (ws)
+- WebSocket
 
 Architecture:
-- Server-authoritative model
-- Low-latency input handling
+- Server-authoritative
+- Real-time 1v1 synchronization
 - Deterministic combat resolution
 
 ---
@@ -68,55 +96,40 @@ Architecture:
 
 1slash/
 │
-├── client/          # Frontend (Canvas + UI)
-├── server/          # WebSocket server
-├── protocol/        # Shared message definitions
-├── docs/            # Design / specs
+├── client/
+├── server/
+├── protocol/
 └── README.md
 
 ---
 
-## 🚀 Getting Started (WIP)
+## 🚧 Development Scope
 
-Coming soon.
+Focused on:
+- 2-player duel only
+- Real-time interaction
+- Tight combat timing
 
----
-
-## 🛠️ Development Status
-
-[ ] Project initialization  
-[ ] Basic WebSocket server  
-[ ] Client rendering  
-[ ] Input system  
-[ ] Combat system  
-[ ] Multiplayer sync  
-[ ] Prediction & reconciliation  
-[ ] Playable prototype  
+Not targeting:
+- Large-scale multiplayer
+- MMO systems
+- Complex matchmaking (for now)
 
 ---
 
 ## 📌 Roadmap
 
 Phase 1:
-- Basic duel loop
-- Single room multiplayer
+- Local / LAN 1v1 duel
+- Core combat system
 
 Phase 2:
-- Combat depth (feint / timing windows)
-- Better netcode
+- Online 1v1 play
+- Latency handling
 
 Phase 3:
-- Matchmaking
-- Spectator mode
+- Matchmaking (optional)
 - Ranking system
-
----
-
-## 🤝 Contribution
-
-Currently in early development.
-
-Contributions, ideas, and feedback are welcome.
 
 ---
 
